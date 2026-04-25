@@ -23,10 +23,9 @@ void server_function() {
         exit(1);
     }
 
+    while(1){
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
-
-    while(1){
     int client_fd = accept(serv_fd, (struct sockaddr*)&client_addr, &client_len);
     if (client_fd == -1) {
         perror("Cannot accept");
