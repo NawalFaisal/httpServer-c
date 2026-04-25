@@ -39,6 +39,20 @@ void server_function() {
 
     if (pid == 0) {
         close(serv_fd);
+
+        char buffer [BUFFER_SIZE];
+        memset(buffer, 0, BUFFER_SIZE);
+
+        int bytes_read = read(client_fd, BUFFER_SIZE - 1);
+        if (bytes_read == -1){
+            perror("Cannot read buffer")
+            exit(1);
+        }
+        
+    printf("request recieved\n")
+    close(client_fd);
+    exit(0); 
+
     } else {
         close(client_fd);
     }
