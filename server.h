@@ -14,3 +14,6 @@
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
 
+void server_function();
+
+#endif   
