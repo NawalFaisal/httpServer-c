@@ -10,7 +10,7 @@ void server_function() {
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(8080);
+    addr.sin_port = htons(PORT);
     addr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(serv_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
@@ -18,7 +18,7 @@ void server_function() {
         exit(1);
     }
 
-    if (listen(serv_fd, 10) == -1) {
+    if (listen(serv_fd, BACKLOG) == -1) {
         perror("Cannot listen");
         exit(1);
     }

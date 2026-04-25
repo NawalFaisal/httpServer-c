@@ -10,5 +10,7 @@
 #include <netinet/in.h>    
 #include <arpa/inet.h>     
 
-
+#define PORT 8080
+#define BACKLOG 10
+#define BUFFER_SIZE 1024
 
