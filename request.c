@@ -28,10 +28,32 @@ HttpRequest parse_request_function(int client_fd){
 
 
     //parse the first line
+    if (scanff(buffer, "%9s %99s %9s", req.method, req.path, req.version) == 3){
+        perror("Cannot parse first line");
+        req.error = REQUEST_BAD;
+        return req;
+    }
+
+    //validate methods
+    if(strcmp(req.method, "GET") ! = 0 && 
+      strcmp(req.method, "PUT")  ! = 0 &&
+      strcmp(req.method, "POST") ! = 0 &&
+      strcmp(req.method, "DELETE") ! = 0 ){
+      req.error = REQUEST_METHOD_NOT_ALLOWED
+      return req;
+      }
+
+    //validate path
+    if(strstr(req.path, "..") != NULL){
+        req.error = REQUEST_FORBIDDEN;
+        return req;
+    }
 
 
+    
 
     return req;
+
 
 
 
