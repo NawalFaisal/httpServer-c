@@ -1,4 +1,5 @@
 #include "server.h"
+#include "request.h"
 
 void server_function() {
 
@@ -40,22 +41,10 @@ void server_function() {
 
     if (pid == 0) {
         close(serv_fd);
-        //read the request
-        char buffer [BUFFER_SIZE];
-        memset(buffer, 0, BUFFER_SIZE);
-
-        int bytes_read = read(client_fd, buffer, BUFFER_SIZE - 1);
-        if (bytes_read == -1){
-            perror("Cannot read buffer");
-            exit(1);
-        }
-        
-        printf("request recieved\n");
-
-    //parse the request
-    char method[10];
-    char path[100];
-    sscanf(buffer, "%s %s", method, path);
+        //call request function and store it in the struct
+        HttpRequest req = parse_request_function(client_fd);
+        (void)req;
+       
 
     //reponse
     char response[] = "HTTP/1.1 200 OK\r\n"
