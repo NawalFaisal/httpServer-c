@@ -44,15 +44,8 @@ void server_function() {
         //call request function and store it in the struct
         HttpRequest req = parse_request_function(client_fd);
         (void)req;
-       
 
-    //reponse
-    char response[] = "HTTP/1.1 200 OK\r\n"
-                  "Content-Type: text/html\r\n"
-                  "\r\n"
-                  "<html><body><h1>Hello</h1></body></html>";
-    
-    write(client_fd, response, strlen(response));
+
     close(client_fd);
     exit(0); 
 

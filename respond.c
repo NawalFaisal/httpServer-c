@@ -1,10 +1,13 @@
-// take the parsed request struct
-// look at the path and decide what to serve
-//if path is / serve index.html
-//if path is /about serve about.html
-// if file exists read it from disk
-// if file doesn't exist send 404
-// build the status line — HTTP/1.1 200 OK
-// build the headers — Content-Type, Content-Length
-// write headers to client_fd
-// write file contents to client_fd
+#include "respond.h"
+
+char *content_type_function(char *path){
+   if (strstr(path, ".html")){
+    return("text/html");
+    return("text/plain");
+   }
+}
+
+
+void error_response_function(int client_fd, int status_code, *message){
+    
+}

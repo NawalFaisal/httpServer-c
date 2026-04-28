@@ -28,18 +28,18 @@ HttpRequest parse_request_function(int client_fd){
 
 
     //parse the first line
-    if (scanff(buffer, "%9s %99s %9s", req.method, req.path, req.version) == 3){
+    if (sscanf(buffer, "%9s %99s %9s", req.method, req.path, req.version) != 3){
         perror("Cannot parse first line");
         req.error = REQUEST_BAD;
         return req;
     }
 
     //validate methods
-    if(strcmp(req.method, "GET") ! = 0 && 
-      strcmp(req.method, "PUT")  ! = 0 &&
-      strcmp(req.method, "POST") ! = 0 &&
-      strcmp(req.method, "DELETE") ! = 0 ){
-      req.error = REQUEST_METHOD_NOT_ALLOWED
+    if(strcmp(req.method, "GET") != 0 && 
+      strcmp(req.method, "PUT")  != 0 &&
+      strcmp(req.method, "POST") != 0 &&
+      strcmp(req.method, "DELETE") != 0 ){
+      req.error = REQUEST_METHOD_NOT_ALLOWED;
       return req;
       }
 
@@ -50,7 +50,9 @@ HttpRequest parse_request_function(int client_fd){
     }
 
 
-    
+
+    //parse headers
+    //use strok_r 
 
     return req;
 
