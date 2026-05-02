@@ -36,5 +36,4 @@ http://35.182.108.2:8080
 
 
 ## Author
-Nawal — Systems engineer in progress
-Building from the ground up
+Nawal Faisal
