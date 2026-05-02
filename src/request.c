@@ -52,7 +52,7 @@ HttpRequest parse_request_function(int client_fd){
 
 
     //parse headers
-    //use strok_r
+    //use strok_r instead of strok for thread saftey when we move away from forking.
     char *saveptr;  //use this to track position
 
     char *line = strtok_r(buffer, "\r\n", &saveptr);
@@ -69,8 +69,6 @@ HttpRequest parse_request_function(int client_fd){
     }
     line = strtok_r(NULL, "\r\n", &saveptr);
 }
-
-
 
     req.error = REQUEST_OK;
     return req;
