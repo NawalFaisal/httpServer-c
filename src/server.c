@@ -1,5 +1,6 @@
 #include "server.h"
 #include "request.h"
+#include "respond.h"
 
 void server_function() {
 
@@ -43,15 +44,19 @@ void server_function() {
         close(serv_fd);
         //call request function and store it in the struct
         HttpRequest req = parse_request_function(client_fd);
-        (void)req;
 
+        if (req.error != REQUEST_OK) {
+        error_response_function(client_fd, req.error);
+        } else {
+            send_response_function(client_fd, &req);
+        }
 
-    close(client_fd);
-    exit(0); 
-
+        close(client_fd);
+        exit(0); 
     } else {
         close(client_fd);
     }
-}
-}
 
+
+}
+}
