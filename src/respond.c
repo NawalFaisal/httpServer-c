@@ -55,7 +55,8 @@ void error_response_function(int client_fd, RequestError error) {
         status_code, message,
         status_code, message);
 
-    write(client_fd, buffer, strlen(buffer));
+    if (write(client_fd, buffer, strlen(buffer))== -1 ){
+        perror("Cannot write response");}
 }
 
 void send_response_function(int client_fd, HttpRequest *req) {
@@ -80,7 +81,13 @@ void send_response_function(int client_fd, HttpRequest *req) {
 
     // read file into buffer
     char *body = malloc(file_size + 1);
-    fread(body, 1, file_size, file);
+    if (fread(body, 1, file_size, file)== 0){
+        perror("Cannot read file");
+        free(body);
+        fclose(file);
+        return;
+    }
+
     body[file_size] = '\0';
     fclose(file);
 
@@ -96,7 +103,11 @@ void send_response_function(int client_fd, HttpRequest *req) {
         "\r\n",
         content_type, file_size);
 
-    write(client_fd, headers, strlen(headers));
-    write(client_fd, body, file_size);
+    if (write(client_fd, headers, strlen(headers))== -1){
+        perror("Cannot write headers");
+    }
+    if (write(client_fd, body, file_size)== -1){
+        perror("Cannot write body");
+    }
     free(body);
 }

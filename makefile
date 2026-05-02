@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -O2 -Iinclude
 
-server: main.c server.c request.c
-	$(CC) $(CFLAGS) -o server main.c server.c request.c
+server: src/main.c src/server.c src/request.c src/respond.c
+	$(CC) $(CFLAGS) -o build/server src/main.c src/server.c src/request.c src/respond.c
 
 clean:
-	rm -f server
+	rm -rf build/server
