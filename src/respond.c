@@ -1,11 +1,13 @@
 #include "respond.h"
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 char *content_type_function(char *path) {
     if (strstr(path, ".html")) return "text/html";
     return "text/plain";
 }
 
-void error_response_function(int client_fd, RequestError error) {
+void error_response_function(SSL *ssl, RequestError error) {
     int status_code;
     char *message;
 
@@ -44,7 +46,6 @@ void error_response_function(int client_fd, RequestError error) {
             break;
     }
 
-    // response string
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
     snprintf(buffer, sizeof(buffer),
@@ -55,11 +56,12 @@ void error_response_function(int client_fd, RequestError error) {
         status_code, message,
         status_code, message);
 
-    if (write(client_fd, buffer, strlen(buffer))== -1 ){
-        perror("Cannot write response");}
+    if (SSL_write(ssl, buffer, strlen(buffer)) <= 0) {
+        ERR_print_errors_fp(stderr);
+    }
 }
 
-void send_response_function(int client_fd, HttpRequest *req) {
+void send_response_function(SSL *ssl, HttpRequest *req) {
     char file_path[200];
     if (strcmp(req->path, "/") == 0) {
         snprintf(file_path, sizeof(file_path), "static/index.html");
@@ -67,21 +69,18 @@ void send_response_function(int client_fd, HttpRequest *req) {
         snprintf(file_path, sizeof(file_path), "static%s", req->path);
     }
 
-    // open 
     FILE *file = fopen(file_path, "r");
     if (file == NULL) {
-        error_response_function(client_fd, REQUEST_NOT_FOUND);
+        error_response_function(ssl, REQUEST_NOT_FOUND);
         return;
     }
 
-    // get size of file
     fseek(file, 0, SEEK_END);
     long file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    // read file into buffer
     char *body = malloc(file_size + 1);
-    if (fread(body, 1, file_size, file)== 0){
+    if (fread(body, 1, file_size, file) == 0) {
         perror("Cannot read file");
         free(body);
         fclose(file);
@@ -91,10 +90,8 @@ void send_response_function(int client_fd, HttpRequest *req) {
     body[file_size] = '\0';
     fclose(file);
 
-    // get content type
     char *content_type = content_type_function(file_path);
 
-    // build and send headers
     char headers[BUFFER_SIZE];
     snprintf(headers, sizeof(headers),
         "HTTP/1.1 200 OK\r\n"
@@ -103,11 +100,13 @@ void send_response_function(int client_fd, HttpRequest *req) {
         "\r\n",
         content_type, file_size);
 
-    if (write(client_fd, headers, strlen(headers))== -1){
-        perror("Cannot write headers");
+    if (SSL_write(ssl, headers, strlen(headers)) <= 0) {
+        fprintf(stderr, "Cannot write headers\n");
+        ERR_print_errors_fp(stderr);
     }
-    if (write(client_fd, body, file_size)== -1){
-        perror("Cannot write body");
+    if (SSL_write(ssl, body, file_size) <= 0) {
+        fprintf(stderr, "Cannot write body\n");
+        ERR_print_errors_fp(stderr);
     }
     free(body);
 }

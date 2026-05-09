@@ -83,10 +83,10 @@ void server_function(SSL_CTX *ctx) {
     if (pid == 0) {
         close(serv_fd);
         //get and instance from our factory
-        SSL *ssl = SLL_new(*ctx);
+        SSL *ssl = SSL_new(ctx);
         //attach to our client fd
-       SSL_set_fd  = (ssl, client_fd);
-       
+       SSL_set_fd(ssl, client_fd);
+
         //TLS handshake
     if (SSL_accept(ssl) <= 0) {
         ERR_print_errors_fp(stderr);

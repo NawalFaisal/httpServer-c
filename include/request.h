@@ -2,6 +2,7 @@
 #define REQUEST_H
 
 #include "server.h"
+#include <openssl/ssl.h>
 
 
 typedef enum{
@@ -32,7 +33,7 @@ typedef struct {
 }HttpRequest;
 
 //prototypes
-HttpRequest parse_request_function(int client_fd);
+HttpRequest parse_request_function(SSL *ssl);
 
 
 #endif 
