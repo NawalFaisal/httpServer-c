@@ -82,17 +82,35 @@ void server_function(SSL_CTX *ctx) {
 
     if (pid == 0) {
         close(serv_fd);
+        //get and instance from our factory
+        SSL *ssl = SLL_new(*ctx);
+        //attach to our client fd
+       SSL_set_fd  = (ssl, client_fd);
+       
+        //TLS handshake
+    if (SSL_accept(ssl) <= 0) {
+        ERR_print_errors_fp(stderr);
+        SSL_free(ssl);
+        close(client_fd);
+        exit(1);
+    }
+    
         //call request function and store it in the struct
-        HttpRequest req = parse_request_function(client_fd);
+        HttpRequest req = parse_request_function(ssl);
 
         if (req.error != REQUEST_OK) {
-        error_response_function(client_fd, req.error);
+        error_response_function(ssl, req.error);
         } else {
-            send_response_function(client_fd, &req);
+            send_response_function(ssl, &req);
         }
 
+
+        // cleanup
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
         close(client_fd);
-        exit(0); 
+        exit(0);
+        
     } else {
         close(client_fd);
     }
