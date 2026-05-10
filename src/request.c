@@ -1,5 +1,6 @@
 #include "server.h"
 #include "request.h"
+#include <openssl/ssl.h>
 
 //request needs to do these 4 things 
 // read bytes from client
@@ -7,7 +8,7 @@
 //validate — is method valid? is path safe?
 // parse the headers — Host, Content-Type etc
 
-HttpRequest parse_request_function(int client_fd){
+HttpRequest parse_request_function(SSL *ssl){
     //init struct
     HttpRequest req;
     //allocate memory to req and zero it out 
@@ -17,10 +18,10 @@ HttpRequest parse_request_function(int client_fd){
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE) ;
     //now read the bytes in the buffer
-    int read_bytes = read(client_fd, buffer, BUFFER_SIZE - 1); // we need to leave the last slot empty for null terminator
+    int read_bytes = SSL_read(ssl, buffer, BUFFER_SIZE - 1); // we need to leave the last slot empty for null terminator
     //error check 
-    if(read_bytes == -1){
-        perror("unable to read request");
+    if(read_bytes <= 0){
+        ERR_print_errors_fp(stderr);
         // use the status error codes in struct
         req.error = REQUEST_BAD;
         return req; 

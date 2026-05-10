@@ -3,3 +3,4 @@ server
 *.o
 *.a
 .vscode/
+certs/key.pem
