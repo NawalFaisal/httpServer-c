@@ -31,9 +31,5 @@ docs/       — documentation
 .github/    — GitHub Actions CI/CD workflow
 ```
 
-## Live
-http://35.182.108.2:8080
-
-
 ## Author
 Nawal Faisal
