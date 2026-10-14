@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror -O2 -Iinclude
 LIBS = -lssl -lcrypto
 
-server: src/main.c src/server.c src/request.c src/respond.c
+server: src/main.c src/server.c src/request.c src/respond.c src/httpstatus.c
 	$(CC) $(CFLAGS) -o build/server src/main.c src/server.c src/request.c src/respond.c $(LIBS)
 
 clean:

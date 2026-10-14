@@ -1,15 +1,16 @@
 #include "server.h"
 #include "request.h"
+// #include "httpstatus.h"
 #include <openssl/ssl.h>
 
-//request needs to do these 4 things 
-// read bytes from client
-//parse the first line — method, path, version
-//validate — is method valid? is path safe?
-// parse the headers — Host, Content-Type etc
+
+
+//also having one function handle numberous things seems to be kinda not very solid principles 
+// i should seperate the parsing,validating and error checking into three seperate fucntions or 
+//i should take my request and seperate it into start, headers and body and all three will have their own parsing validating and error handling
+//not sure which one is more effeint but will come back as of right now im satisified with this
 
 HttpRequest parse_request_function(SSL *ssl){
-    //init struct
     HttpRequest req;
     //allocate memory to req and zero it out 
     memset(&req, 0, sizeof(req));
@@ -23,33 +24,34 @@ HttpRequest parse_request_function(SSL *ssl){
     if(read_bytes <= 0){
         ERR_print_errors_fp(stderr);
         // use the status error codes in struct
-        req.error = REQUEST_BAD;
+        // HTTP_BAD_REQUEST;  //throws a statement with no affect error not sure why i made this design decision
         return req; 
     }
 
 
     //parse the first line
+     // post /http /1.1 
+     //ngl this seems weak but we prevail
     if (sscanf(buffer, "%9s %99s %9s", req.method, req.path, req.version) != 3){
         perror("Cannot parse first line");
-        req.error = REQUEST_BAD;
+        // HTTP_BAD_REQUEST;
         return req;
     }
 
+
     //validate methods
+    // while its not a magic number i feel like taking the string i our req method we parsed from the buffer and comaping it with the string methods seems weak
+     // is this case senstive what is its get instead of GET 
+     //not sure if zero can be cosnisdered a magic number 
+
     if(strcmp(req.method, "GET") != 0 && 
       strcmp(req.method, "PUT")  != 0 &&
       strcmp(req.method, "POST") != 0 &&
       strcmp(req.method, "DELETE") != 0 ){
-      req.error = REQUEST_METHOD_NOT_ALLOWED;
+    //   HTTP_METHOD_NOT_ALLOWED;
+    //dont use htttps status actually handle the error 
       return req;
       }
-
-    //validate path
-    if(strstr(req.path, "..") != NULL){
-        req.error = REQUEST_FORBIDDEN;
-        return req;
-    }
-
 
 
     //parse headers
@@ -71,7 +73,7 @@ HttpRequest parse_request_function(SSL *ssl){
     line = strtok_r(NULL, "\r\n", &saveptr);
 }
 
-    req.error = REQUEST_OK;
+    // HTTP_OK;
     return req;
 
 

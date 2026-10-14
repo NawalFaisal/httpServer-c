@@ -1,60 +1,32 @@
 #include "respond.h"
+#include "httpstatus.h"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+
+
+
+// function to determine what content type it returns
 char *content_type_function(char *path) {
     if (strstr(path, ".html")) return "text/html";
     return "text/plain";
 }
 
-void error_response_function(SSL *ssl, RequestError error) {
-    int status_code;
-    char *message;
 
-    switch(error) {
-        case REQUEST_BAD:
-            status_code = 400;
-            message = "Bad Request";
-            break;
-        case REQUEST_UNAUTHORIZED:
-            status_code = 401;
-            message = "Unauthorized";
-            break;
-        case REQUEST_FORBIDDEN:
-            status_code = 403;
-            message = "Forbidden";
-            break;
-        case REQUEST_NOT_FOUND:
-            status_code = 404;
-            message = "Not Found";
-            break;
-        case REQUEST_METHOD_NOT_ALLOWED:
-            status_code = 405;
-            message = "Method Not Allowed";
-            break;
-        case REQUEST_PAYLOAD_TOO_LARGE:
-            status_code = 413;
-            message = "Payload Too Large";
-            break;
-        case REQUEST_SERVICE_UNAVAILABLE:
-            status_code = 503;
-            message = "Service Unavailable";
-            break;
-        default:
-            status_code = 500;
-            message = "Internal Server Error";
-            break;
-    }
-
+//
+void error_response_function(SSL *ssl, ) {
+    http_status_text()
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
     snprintf(buffer, sizeof(buffer),
-        "HTTP/1.1 %d %s\r\n"
-        "Content-Type: text/html\r\n"
+        "HTTP/1.1 %d %s\r\n"   //hardcoded 
+        "Content-Type: text/html\r\n" //hardcoded
         "\r\n"
-        "<html><body><h1>%d %s</h1></body></html>",
+        "<html><body><h1>%d %s</h1></body></html>", //hardcoded
         status_code, message,
         status_code, message);
+
+        
 
     if (SSL_write(ssl, buffer, strlen(buffer)) <= 0) {
         ERR_print_errors_fp(stderr);

@@ -5,19 +5,7 @@
 #include <openssl/ssl.h>
 
 
-typedef enum{
-    REQUEST_OK,   
-    REQUEST_BAD,
-    REQUEST_UNAUTHORIZED,
-    REQUEST_FORBIDDEN,
-    REQUEST_NOT_FOUND,
-    REQUEST_METHOD_NOT_ALLOWED,
-    REQUEST_PAYLOAD_TOO_LARGE,
-    REQUEST_INTERNAL_SERVER_ERROR,
-    REQUEST_SERVICE_UNAVAILABLE
-    
-}RequestError;
-
+// struct of the request body
 typedef struct {
     char method[10];
     char path[100];
@@ -28,7 +16,6 @@ typedef struct {
     char accept[100];
     int content_length;
     char body[BUFFER_SIZE];
-    RequestError error;
 
 }HttpRequest;
 
