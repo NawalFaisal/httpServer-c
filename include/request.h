@@ -3,20 +3,8 @@
 
 #include "server.h"
 #include <openssl/ssl.h>
+#include "httpstatus.h"
 
-
-typedef enum{
-    REQUEST_OK,   
-    REQUEST_BAD,
-    REQUEST_UNAUTHORIZED,
-    REQUEST_FORBIDDEN,
-    REQUEST_NOT_FOUND,
-    REQUEST_METHOD_NOT_ALLOWED,
-    REQUEST_PAYLOAD_TOO_LARGE,
-    REQUEST_INTERNAL_SERVER_ERROR,
-    REQUEST_SERVICE_UNAVAILABLE
-    
-}RequestError;
 
 typedef struct {
     char method[10];
@@ -26,13 +14,12 @@ typedef struct {
     char content_type[100];
     char user_agent[200];
     char accept[100];
-    int content_length;
+    int  content_length;
     char body[BUFFER_SIZE];
-    RequestError error;
+    HttpStatus status;
 
 }HttpRequest;
 
-//prototypes
 HttpRequest parse_request_function(SSL *ssl);
 
 

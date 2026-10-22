@@ -1,56 +1,47 @@
 #include "server.h"
 #include "request.h"
 #include <openssl/ssl.h>
+#include "httpstatus.h"
 
-//request needs to do these 4 things 
-// read bytes from client
-//parse the first line — method, path, version
-//validate — is method valid? is path safe?
-// parse the headers — Host, Content-Type etc
 
 HttpRequest parse_request_function(SSL *ssl){
-    //init struct
     HttpRequest req;
-    //allocate memory to req and zero it out 
     memset(&req, 0, sizeof(req));
-
-    // allocate memeory to buffer
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE) ;
-    //now read the bytes in the buffer
-    int read_bytes = SSL_read(ssl, buffer, BUFFER_SIZE - 1); // we need to leave the last slot empty for null terminator
-    //error check 
+
+    int read_bytes = SSL_read(ssl, buffer, BUFFER_SIZE - 1); 
+    
     if(read_bytes <= 0){
         ERR_print_errors_fp(stderr);
-        // use the status error codes in struct
-        req.error = REQUEST_BAD;
-        return req; 
+        req.status = HTTP_BAD_REQUEST;
+        return req;
+  
     }
 
-
     //parse the first line
+     // post /http /1.1 
+     //ngl this seems weak but we prevail
     if (sscanf(buffer, "%9s %99s %9s", req.method, req.path, req.version) != 3){
         perror("Cannot parse first line");
-        req.error = REQUEST_BAD;
+        req.status = HTTP_BAD_REQUEST;
         return req;
     }
 
-    //validate methods
+    
     if(strcmp(req.method, "GET") != 0 && 
       strcmp(req.method, "PUT")  != 0 &&
       strcmp(req.method, "POST") != 0 &&
       strcmp(req.method, "DELETE") != 0 ){
-      req.error = REQUEST_METHOD_NOT_ALLOWED;
-      return req;
-      }
+        perror("Method not found");
+        req.status = HTTP_NOT_FOUND;
+        return req;}
 
-    //validate path
-    if(strstr(req.path, "..") != NULL){
-        req.error = REQUEST_FORBIDDEN;
-        return req;
+        //weak path traversal
+    if (strstr(req.path, "..") != NULL) {
+    req.status = HTTP_FORBIDDEN;
+    return req;
     }
-
-
 
     //parse headers
     //use strok_r instead of strok for thread saftey when we move away from forking.
@@ -70,12 +61,8 @@ HttpRequest parse_request_function(SSL *ssl){
     }
     line = strtok_r(NULL, "\r\n", &saveptr);
 }
-
-    req.error = REQUEST_OK;
+    req.status = HTTP_OK;
     return req;
-
-
-
 
 }
 
