@@ -1,17 +1,10 @@
 #include "httpstatus.h"
 #include <stddef.h>
 
-
-//this unamed struct that i dont seem to be using anywhere is static to this file and its a constant
-//wait my arrray is the name of it ?
 static const struct {
     HttpStatus status;
     const char* text;
-} 
-
-//this is an array so its a key value look up 
-//i need this is source code so it allcoates mem to array at runtime
-status_table[] = {
+} status_table[] = {
     {HTTP_OK, "OK"},
     {HTTP_BAD_REQUEST, "Bad Request"},
     {HTTP_UNAUTHORIZED, "Unauthorized"},

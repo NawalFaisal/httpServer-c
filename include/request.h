@@ -3,9 +3,9 @@
 
 #include "server.h"
 #include <openssl/ssl.h>
+#include "httpstatus.h"
 
 
-// struct of the request body
 typedef struct {
     char method[10];
     char path[100];
@@ -14,12 +14,12 @@ typedef struct {
     char content_type[100];
     char user_agent[200];
     char accept[100];
-    int content_length;
+    int  content_length;
     char body[BUFFER_SIZE];
+    HttpStatus status;
 
 }HttpRequest;
 
-//prototypes
 HttpRequest parse_request_function(SSL *ssl);
 
 

@@ -1,6 +1,13 @@
 #include "server.h"
 #include "request.h"
 #include "respond.h"
+#include "httpstatus.h"
+
+
+//function declrations first line of function with a semi colon before the body
+HttpRequest parse_request_function(SSL *ssl);
+void error_response_function(SSL *ssl, HttpStatus status);
+void send_response_function(SSL *ssl, HttpRequest *req);
 
 
 //sll function create context we need to bundle information like or key and cert so they know hey this is safe and has abadge
@@ -64,6 +71,7 @@ void server_function(SSL_CTX *ctx) {
         perror("Cannot listen");
         exit(1);
     }
+    
 
     while(1){
     struct sockaddr_in client_addr;
@@ -96,11 +104,12 @@ void server_function(SSL_CTX *ctx) {
     }
     
         //call request function and store it in the struct
+        //i need to pass in arguments into their given parameters
+        //where am i getting status from
         HttpRequest req = parse_request_function(ssl);
-
-        if (req.error != REQUEST_OK) {
-        error_response_function(ssl, req.error);
-        } else {
+        if(req.status != HTTP_OK)
+        error_response_function(ssl, req.status);
+         else {
             send_response_function(ssl, &req);
         }
 

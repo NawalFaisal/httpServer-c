@@ -2,9 +2,11 @@
 #include "httpstatus.h"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include "request.h"
 
 
-
+//fucntion declratins
+const char *http_status_text(HttpStatus status);
 
 // function to determine what content type it returns
 char *content_type_function(char *path) {
@@ -13,25 +15,23 @@ char *content_type_function(char *path) {
 }
 
 
-//
-void error_response_function(SSL *ssl, ) {
-    http_status_text()
+void error_response_function(SSL *ssl, HttpStatus status) {
+    const char *text = http_status_text(status);
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
+
     snprintf(buffer, sizeof(buffer),
-        "HTTP/1.1 %d %s\r\n"   //hardcoded 
-        "Content-Type: text/html\r\n" //hardcoded
+        "HTTP/1.1 %d %s\r\n"  
+        "Content-Type: text/html\r\n" 
         "\r\n"
-        "<html><body><h1>%d %s</h1></body></html>", //hardcoded
-        status_code, message,
-        status_code, message);
-
-        
-
+        "<html><body><h1>%d %s</h1></body></html>",
+         status, text, status, text);  //call my http status text message it will print the array of both status and text mapped to the status that passsed as an argument
+   
     if (SSL_write(ssl, buffer, strlen(buffer)) <= 0) {
         ERR_print_errors_fp(stderr);
     }
 }
+
 
 void send_response_function(SSL *ssl, HttpRequest *req) {
     char file_path[200];
@@ -43,7 +43,7 @@ void send_response_function(SSL *ssl, HttpRequest *req) {
 
     FILE *file = fopen(file_path, "r");
     if (file == NULL) {
-        error_response_function(ssl, REQUEST_NOT_FOUND);
+        error_response_function(ssl, HTTP_NOT_FOUND);
         return;
     }
 
